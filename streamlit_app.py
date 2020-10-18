@@ -4,12 +4,15 @@ import altair as alt
 
 st.title("Let's analyze some Spotify Data :)")
 
+'''
+Loading the Data Tables and Merging Tables
+'''
 data_source = 'public'
 
-genres_url = "genres_{}.csv".format(data_source)
-artists_url = "artists_{}.csv".format(data_source)
-track_features_url = "track_features_{}.csv".format(data_source)
 streaming_history_url = "streaming_history_{}.csv".format(data_source)
+track_features_url = "track_features_{}.csv".format(data_source)
+artists_url = "artists_{}.csv".format(data_source)
+genres_url = "genres_{}.csv".format(data_source)
 
 @st.cache  # add caching so we load the data only once
 def load_data(url):
@@ -21,27 +24,29 @@ def merge_data(sh, tracks, artists):
     df = df.merge(artists, on=['artistName'], suffixes=['_track', '_artist'])
     return df
 
-genres_df = load_data(genres_url)
-artists_df = load_data(artists_url)
-track_features_df = load_data(track_features_url)
 streaming_history_df = load_data(streaming_history_url)
+track_features_df = load_data(track_features_url)
+artists_df = load_data(artists_url)
+genres_df = load_data(genres_url)
 
-st.write("Let's look at raw data in the Pandas Data Frame.")
-
-st.write("Genres.")
-st.write(genres_df)
-st.write("Artists.")
-st.write(artists_df)
-st.write("Track Features.")
-st.write(track_features_df)
-st.write("Streaming History.")
-st.write(streaming_history_df)
+if st.checkbox("Show Raw Data", value=False):
+	st.write("Streaming History.")
+	st.write(streaming_history_df)
+	st.write("Track Features.")
+	st.write(track_features_df)
+	st.write("Artists.")
+	st.write(artists_df)
+	st.write("Genres.")
+	st.write(genres_df)
 
 df = merge_data(streaming_history_df, track_features_df, artists_df)
 
-st.write("Streaming History Merged.")
-st.write(df)
+if st.checkbox("Show Merged Data", value=False):
+	st.write(df)
 
+'''
+Visualizations
+'''
 
 chart = alt.Chart(track_features_df).mark_point().encode(
     x=alt.X("energy", scale=alt.Scale(zero=False)),
