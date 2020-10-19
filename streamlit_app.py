@@ -56,6 +56,7 @@ if st.checkbox("Show Merged Data", value=False):
 # Some are 1 - 100 ms difference. Ideas: filter out songs that were listened to for less than 'z' ms; filter out songs that were listened to less than 'w'%
 # of their duration; re-calculate the num_listens? (round up/down to the nearest integer so that those songs that were listened to close to 2 times would
 # be counted as such)
+
 # want the slider to be in seconds not milliseconds
 ms_per_second = 1000
 # calculate the max of seconds played
@@ -84,37 +85,53 @@ played_vs_duration = alt.Chart(df).mark_bar().encode(
 )
 st.write(played_vs_duration)
 
-# MESSING AROUND (DON'T LOOK AT YET)
-# Two different visualizations of which days more listening occurs on
-# On x-axis: time, on y-axis: sum song count listened per x-axis day
-#num_songs_chart = alt.Chart(streaming_history_df).mark_area().encode(
-#	x="endTime_loc",
-#	y="count()",
-#	tooltip = "count()"
-#)
-#st.write(num_songs_chart)
+# For now, chose a max value of 20s from the played vs duration chart
+# This means that there can be 0 - 3 records in the filtered table
+# that have the same end time
+seconds_cutoff = 20
+ms_cutoff = seconds_cutoff * ms_per_second
 
-#num_songs_chart_filtered = alt.Chart(df).mark_area().encode(
-#	x="endTime_loc",
-#	y="y:Q",
-#	color = "duration_ms",
-#	tooltip = ["msPlayed", "duration_ms", "count()"]
-#).transform_calculate(
-	# making a new field to compare how long the track is played vs. how long the track actually is
-#	y = "datum.duration_ms + datum.msPlayed"
-#)
-# .transform_filter(
-#	datum.msPlayed != datum.duration_ms
-# )
-#st.write(num_songs_chart_filtered)
+# calculating the total hours played to see how much sparcity we might expect
+seconds_per_minute = 60
+minutes_per_hour = 60
+sum_hours_played = sum(df["msPlayed"]) / (ms_per_second * seconds_per_minute * minutes_per_hour)
+st.write("total hours played = ", sum_hours_played)
+
+# On x-axis: time, on y-axis: sum song count listened per x-axis day
+num_songs_chart = alt.Chart(streaming_history_df).mark_bar().encode(
+	alt.X("monthdate(endTime_loc):T"),
+	y="count():Q",
+	tooltip = ["count():Q", "sum(minutesPlayed):Q"]
+).transform_calculate(
+	minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
+).transform_filter(
+	datum.msPlayed > ms_cutoff
+).properties(
+	width = 2000
+)
+
+st.write(num_songs_chart)
 
 # On x-axis: time, on y-axis sum time listened to music per x-axis day
-# num_time_chart = 
+num_time_chart = alt.Chart(streaming_history_df).mark_bar().encode(
+	alt.X("monthdate(endTime_loc):T"),
+	y="sum(minutesPlayed):Q",
+	tooltip = ["count():Q", "sum(minutesPlayed):Q"]
+).transform_calculate(
+	minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
+).transform_filter(
+	datum.msPlayed > ms_cutoff
+).properties(
+	width = 2000
+)
+st.write(num_time_chart)
 
+# For when selection interaction is used!
 #.add_selection(
-#	alt.selection_single(fields=["duration_minus_play"])
+#	alt.selection_single(fields=["msPlayed"])
 #
 
+# VISUALIZATIONS FROM SATURDAY
 #chart = alt.Chart(track_features_df).mark_point().encode(
 #    x=alt.X("energy", scale=alt.Scale(zero=False)),
 #    y=alt.Y("danceability", scale=alt.Scale(zero=False)),
@@ -125,7 +142,6 @@ st.write(played_vs_duration)
 
 #st.write(chart)
 
-# VISUALIZATIONS FROM SATURDAY
 #pop_df = track_features_df.merge(artists_df, on=['artistName'], suffixes=['_track', '_artist'])
 #st.write(pop_df)
 #popularity_chart = alt.Chart(pop_df).mark_point().encode(
