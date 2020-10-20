@@ -101,8 +101,8 @@ ms_cutoff = seconds_cutoff * ms_per_second
 # calculating the total hours played to see how much sparcity we might expect
 seconds_per_minute = 60
 minutes_per_hour = 60
-sum_hours_played = sum(df["msPlayed"]) / (ms_per_second * seconds_per_minute * minutes_per_hour)
-st.write("Total hours played = ", sum_hours_played)
+# sum_hours_played = sum(df["msPlayed"]) / (ms_per_second * seconds_per_minute * minutes_per_hour)
+# st.write("Total hours played = ", sum_hours_played)
 
 
 st.title('When do I listen to music?')
@@ -156,7 +156,30 @@ num_time_chart = alt.Chart(streaming_history_df).mark_bar().encode(
 )
 st.write(num_time_chart)
 
+st.write('What are my weekly and daily listening patterns?')
 
+date_range_selection = alt.selection_interval()
+
+heat_map = alt.Chart(df).mark_rect().encode(
+    alt.X('yearmonthdate(endTime_loc):T', title='hour of day'),
+    alt.Y('count()', title='day of week'),
+    alt.Color('count():Q', title='Count Songs Listened')
+).transform_filter(
+    datum.msPlayed > ms_cutoff
+).properties(
+    width = 1000,
+    height = 400
+)
+#st.write(heat_map)
+st.write(heat_map.encode(
+    alt.X('hours(endTime_loc):O'), alt.Y('day_of_week:O', title='day of week'), #, scale=alt.Scale(domain=date_range_selection))
+).transform_filter( date_range_selection) & heat_map.properties(height=50).add_selection(date_range_selection).transform_filter( datum.msPlayed > ms_cutoff)
+)
+# st.write(heat_map.add_selection(date_range_selection).transform_filter(date_range_selection))
+# For when selection interaction is used!
+#.add_selection(
+#	alt.selection_single(fields=["msPlayed"])
+#
 
 st.title("What types of music do I listen to?")
 
@@ -195,10 +218,10 @@ st.write(correlation_chart)
 # )
 # st.write(metric_histograms)
 
-st.write("There are serveral music metrics for each song I listened to:")
+st.write("There are several music metrics for each song I listened to:")
 metric_histograms = []
 for music_metric in music_metrics:
-    if st.checkbox("Show " + music_metric, value=False):
+    if st.checkbox("Show " + music_metric, value=True):
         metric_histogram = alt.Chart(df).mark_bar().encode(
             alt.X(music_metric + ":Q", bin=alt.Bin(step=0.1)),
             y = "count():Q",
@@ -208,30 +231,6 @@ for music_metric in music_metrics:
             height = 200
         )
         st.write(metric_histogram)
-
-
-date_range_selection = alt.selection_interval()
-
-heat_map = alt.Chart(df).mark_rect().encode(
-    alt.X('yearmonthdate(endTime_loc):T', title='hour of day'),
-    alt.Y('count()', title='day of week'),
-    alt.Color('count():Q', title='Count Songs Listened')
-).transform_filter(
-    datum.msPlayed > ms_cutoff
-).properties(
-    width = 1000,
-    height = 400
-)
-#st.write(heat_map)
-st.write(heat_map.encode(
-    alt.X('hours(endTime_loc):O'), alt.Y('day_of_week:O', title='day of week'), #, scale=alt.Scale(domain=date_range_selection))
-).transform_filter( date_range_selection) & heat_map.properties(height=50).add_selection(date_range_selection).transform_filter( datum.msPlayed > ms_cutoff)
-)
-# st.write(heat_map.add_selection(date_range_selection).transform_filter(date_range_selection))
-# For when selection interaction is used!
-#.add_selection(
-#	alt.selection_single(fields=["msPlayed"])
-#
 
 # VISUALIZATIONS FROM SATURDAY
 #chart = alt.Chart(track_features_df).mark_point().encode(
