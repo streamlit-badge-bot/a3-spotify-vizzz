@@ -45,6 +45,50 @@ df = merge_data(streaming_history_df, track_features_df, artists_df)
 if st.checkbox("Show Merged Data", value=False):
 	st.write(df)
 
+broad_genres = ["Hip Hop", "Pop",  "Rap",  "R&B", "Electronica", "Rock", "Jazz", "Classical", "Other"]
+hip_hop_genres = ["hop", "boom bap"]
+pop_genres = ["pop"]
+rap_genres = ["rap", "trap"]
+r_b_genres = ["r&b", "soul"]
+electronica_genres = ["electronica"]
+rock_genres = ["rock"]
+jazz_genres = ["jazz", "bassa nova"]
+classical_genres = ["classical"]
+
+genres_extra_df = genres_df.copy()
+broad_genres = []
+for index, row in genres_extra_df.iterrows():
+	specific_genre = row['genre']
+	if any(substring in specific_genre for substring in hip_hop_genres):
+		broad_genres.append("Hip Hop")
+	elif any(substring in specific_genre for substring in pop_genres):
+		broad_genres.append("Pop")
+	elif any(substring in specific_genre for substring in rap_genres):
+		broad_genres.append("Rap")
+	elif any(substring in specific_genre for substring in r_b_genres):
+		broad_genres.append("R&B")
+	elif any(substring in specific_genre for substring in electronica_genres):
+		broad_genres.append("Electronica")
+	elif any(substring in specific_genre for substring in rock_genres):
+		broad_genres.append("Rock")
+	elif any(substring in specific_genre for substring in jazz_genres):
+		broad_genres.append("Jazz")
+	elif any(substring in specific_genre for substring in classical_genres):
+		broad_genres.append("Classical")
+	else:
+		broad_genres.append("Other")
+
+genres_extra_df['broad_genre'] = broad_genres
+st.write(genres_extra_df)
+
+if st.checkbox("Show Univariate Summaries", value=True):
+	genres_univariate = alt.Chart(genres_extra_df).mark_bar().encode(
+		x = "count():Q",
+		y = alt.Y("genre:N", sort='-x'),
+		tooltip = ["count():Q", "broad_genre:N"],
+		color = alt.Color("broad_genre:N")
+	)
+	st.write(genres_univariate)
 # Filter out the rows where the song is not listened all the way through (assume that this indicates switching between songs)
 
 st.header('When I listen to music, do I listen to the whole song?')
