@@ -370,9 +370,9 @@ for music_metric in music_metrics:
         st.write(metric_histogram)
 
 input_dropdown = alt.binding_select(options=broad_genres)
-selection = alt.selection_single(fields=['broad_genres:N'], bind=input_dropdown, name='Country of ')
+selection = alt.selection_single(fields=['broad_genre'], bind=input_dropdown, name='Country of ')
 color = alt.condition(selection,
-                    alt.Color('broad_genres:N'),
+                    alt.Color('broad_genre:N'),
                     alt.value('#00000000'))
 
 danceability_vs_hour = alt.Chart(df).mark_point().encode(
