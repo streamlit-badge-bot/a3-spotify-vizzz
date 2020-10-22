@@ -262,30 +262,38 @@ for music_metric in music_metrics:
 
 st.subheader("Now we can explore the relationship between one of these metrics, genre, and time!")
 
+hoursMinutesOrdered = []
+for hour in range(0, 24):
+    for minute in range(0, 60):
+        hoursMinutesOrdered.append(alt.DateTime(hours = hour, minutes = minute))
+
 input_dropdown = alt.binding_select(options=broad_genres, name = "Broad Genre: ")
 selection = alt.selection_single(fields=['broad_genres'], bind=input_dropdown)
-color = alt.condition(selection,
-                    alt.Color('broad_genres:N'),
-                    alt.value('#00000000'))
+color = alt.condition(selection, alt.Color('broad_genres:N'), alt.value('#00000000'))
 
-# metric_dropdown = alt.binding_select(options=music_metrics, name = "Music Metric: ")
-# metric_selection = alt.selection_single(fields=["metric"], bind=metric_dropdown)
 metric_dropdown = st.selectbox('Music Metric:', music_metrics)
-# color = alt.condition(selection,
-#                     alt.Color('broad_genres:N'),
-#                     alt.value('#00000000'))
 
-danceability_vs_hour = alt.Chart(df).mark_point().encode(
-    x=alt.X('hoursminutes(endTime_loc):O', title="Hour of the Day"),
-    y=alt.Y(metric_dropdown, type="quantitative", scale=alt.Scale(zero=False)),
-    color=color,
-).add_selection(
-    selection
+base_danceability_vs_hour = alt.Chart(df).mark_point().encode(
+    x=alt.X('hoursminutes(endTime_loc):O', title="Hour of the Day", scale = alt.Scale(domain=hoursMinutesOrdered)),
+    y=alt.Y(metric_dropdown, type="quantitative", scale=alt.Scale(zero=False, domain=[0.0, 1.0]))
 ).properties(
     width=1000, height=600
 )
 
-st.write(danceability_vs_hour)
+danceability_vs_hour = base_danceability_vs_hour.encode(
+  color=alt.condition(selection, 'broad_genres:N', alt.value('#00000000'))
+).add_selection(
+  selection
+)
+
+overlay_danceability_vs_hour = base_danceability_vs_hour.encode(
+  opacity=alt.value(0),
+  tooltip=['artistName:N', 'trackName:N']
+).transform_filter(
+  selection
+)
+
+st.write(danceability_vs_hour + overlay_danceability_vs_hour)
 
 
 st.header("Throughout the day, how much music do I usually listen to? What types?")
