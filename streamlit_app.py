@@ -7,7 +7,7 @@ from collections import Counter
 
 st.title("What is the relationship between time and the music that I listen to?")
 st.subheader("In this application, we will explore how time affects our " \
-		+ "music listening habits by visualizing an export of personal Spotify data.");
+        + "music listening habits by visualizing an export of personal Spotify data.");
 
 # Loading the Data Tables and Merging Tables
 data_source = 'public'
@@ -33,14 +33,14 @@ artists_df = load_data(artists_url)
 genres_df = load_data(genres_url)
 
 if st.checkbox("Show Raw Data", value=False):
-	st.write("Streaming History.")
-	st.write(streaming_history_df)
-	st.write("Track Features.")
-	st.write(track_features_df)
-	st.write("Artists.")
-	st.write(artists_df)
-	st.write("Genres.")
-	st.write(genres_df)
+    st.write("Streaming History.")
+    st.write(streaming_history_df.head(40))
+    st.write("Track Features.")
+    st.write(track_features_df.head(40))
+    st.write("Artists.")
+    st.write(artists_df.head(40))
+    st.write("Genres.")
+    st.write(genres_df.head(40))
 
 broad_genres = ["Other", "Hip Hop", "Pop",  "Rap",  "R&B", "Electronica", "Rock", "Jazz", "Classical", "Indie", "Folk/Country", "No Genre", "Tie Genre"]
 hip_hop_genres = ["hop", "boom bap", "funk", "urban contemporary", "lo-fi"]
@@ -54,31 +54,31 @@ classical_genres = ["classical", "baroque", "piano cover", "impressionism", "ear
 folk_country_genres = ["country", "folk"]
 indie_genres = ["indie"]
 
-# India motion picture industry: filmi, 
+# India motion picture industry: filmi,
 
 # categorizing the genres table
 # genres_extra_df = genres_df.copy()
 # broad_genres = []
 # for index, row in genres_extra_df.iterrows():
-# 	specific_genre = row['genre']
-# 	if any(substring in specific_genre for substring in hip_hop_genres):
-# 		broad_genres.append("Hip Hop")
-# 	elif any(substring in specific_genre for substring in pop_genres):
-# 		broad_genres.append("Pop")
-# 	elif any(substring in specific_genre for substring in rap_genres):
-# 		broad_genres.append("Rap")
-# 	elif any(substring in specific_genre for substring in r_b_genres):
-# 		broad_genres.append("R&B")
-# 	elif any(substring in specific_genre for substring in electronica_genres):
-# 		broad_genres.append("Electronica")
-# 	elif any(substring in specific_genre for substring in rock_genres):
-# 		broad_genres.append("Rock")
-# 	elif any(substring in specific_genre for substring in jazz_genres):
-# 		broad_genres.append("Jazz")
-# 	elif any(substring in specific_genre for substring in classical_genres):
-# 		broad_genres.append("Classical")
-# 	else:
-# 		broad_genres.append("Other")
+#   specific_genre = row['genre']
+#   if any(substring in specific_genre for substring in hip_hop_genres):
+#       broad_genres.append("Hip Hop")
+#   elif any(substring in specific_genre for substring in pop_genres):
+#       broad_genres.append("Pop")
+#   elif any(substring in specific_genre for substring in rap_genres):
+#       broad_genres.append("Rap")
+#   elif any(substring in specific_genre for substring in r_b_genres):
+#       broad_genres.append("R&B")
+#   elif any(substring in specific_genre for substring in electronica_genres):
+#       broad_genres.append("Electronica")
+#   elif any(substring in specific_genre for substring in rock_genres):
+#       broad_genres.append("Rock")
+#   elif any(substring in specific_genre for substring in jazz_genres):
+#       broad_genres.append("Jazz")
+#   elif any(substring in specific_genre for substring in classical_genres):
+#       broad_genres.append("Classical")
+#   else:
+#       broad_genres.append("Other")
 
 # genres_extra_df['broad_genre'] = broad_genres
 # st.write(genres_extra_df)
@@ -89,79 +89,79 @@ artists_broad_genres = []
 other_array = []
 # tie_count = 0
 for index, row in artists_extra_df.iterrows():
-	genre_array = row['genres']
-	if (str(genre_array) == "nan"):
-		artists_broad_genres.append("No Genre")
-	else:
-		trimmed_genre_array = genre_array[1:-1].replace("'", "").replace(", ", ",")
-		specific_genre_array = trimmed_genre_array.split(",")
-		# st.write(index, specific_genre_array, len(specific_genre_array))
-		if len(specific_genre_array) == int(1) and specific_genre_array[0] == "":
-			artists_broad_genres.append("No Genre")
-		else:
-			count_array = [0] * len(broad_genres)
-			for specific_genre in specific_genre_array:
-				if any(substring in specific_genre for substring in hip_hop_genres):
-					count_array[broad_genres.index("Hip Hop")] += 1
-				elif any(substring in specific_genre for substring in pop_genres):
-					count_array[broad_genres.index("Pop")] += 1
-				elif any(substring in specific_genre for substring in rap_genres):
-					count_array[broad_genres.index("Rap")] += 1
-				elif any(substring in specific_genre for substring in r_b_genres):
-					count_array[broad_genres.index("R&B")] += 1
-				elif any(substring in specific_genre for substring in electronica_genres):
-					count_array[broad_genres.index("Electronica")] += 1
-				elif any(substring in specific_genre for substring in rock_genres):
-					count_array[broad_genres.index("Rock")] += 1
-				elif any(substring in specific_genre for substring in jazz_genres):
-					count_array[broad_genres.index("Jazz")] += 1
-				elif any(substring in specific_genre for substring in classical_genres):
-					count_array[broad_genres.index("Classical")] += 1
-				elif any(substring in specific_genre for substring in indie_genres):
-					count_array[broad_genres.index("Indie")] += 1
-				elif any(substring in specific_genre for substring in folk_country_genres):
-					count_array[broad_genres.index("Folk/Country")] += 1
-				else:
-					count_array[broad_genres.index("Other")] += 1
-					other_array.append(specific_genre)
-			# artists_broad_genres
-			max_num = np.array(count_array).max()
-			if (count_array.count(max_num) > 1):
-				# st.write(index, specific_genre_array, count_array)
-				# st.write("======================================")
-				# tie_count += 1
-				artists_broad_genres.append("Tie Genre")
-			else:
-				artists_broad_genres.append(broad_genres[np.array(count_array).argmax()])
+    genre_array = row['genres']
+    if (str(genre_array) == "nan"):
+        artists_broad_genres.append("No Genre")
+    else:
+        trimmed_genre_array = genre_array[1:-1].replace("'", "").replace(", ", ",")
+        specific_genre_array = trimmed_genre_array.split(",")
+        # st.write(index, specific_genre_array, len(specific_genre_array))
+        if len(specific_genre_array) == int(1) and specific_genre_array[0] == "":
+            artists_broad_genres.append("No Genre")
+        else:
+            count_array = [0] * len(broad_genres)
+            for specific_genre in specific_genre_array:
+                if any(substring in specific_genre for substring in hip_hop_genres):
+                    count_array[broad_genres.index("Hip Hop")] += 1
+                elif any(substring in specific_genre for substring in pop_genres):
+                    count_array[broad_genres.index("Pop")] += 1
+                elif any(substring in specific_genre for substring in rap_genres):
+                    count_array[broad_genres.index("Rap")] += 1
+                elif any(substring in specific_genre for substring in r_b_genres):
+                    count_array[broad_genres.index("R&B")] += 1
+                elif any(substring in specific_genre for substring in electronica_genres):
+                    count_array[broad_genres.index("Electronica")] += 1
+                elif any(substring in specific_genre for substring in rock_genres):
+                    count_array[broad_genres.index("Rock")] += 1
+                elif any(substring in specific_genre for substring in jazz_genres):
+                    count_array[broad_genres.index("Jazz")] += 1
+                elif any(substring in specific_genre for substring in classical_genres):
+                    count_array[broad_genres.index("Classical")] += 1
+                elif any(substring in specific_genre for substring in indie_genres):
+                    count_array[broad_genres.index("Indie")] += 1
+                elif any(substring in specific_genre for substring in folk_country_genres):
+                    count_array[broad_genres.index("Folk/Country")] += 1
+                else:
+                    count_array[broad_genres.index("Other")] += 1
+                    other_array.append(specific_genre)
+            # artists_broad_genres
+            max_num = np.array(count_array).max()
+            if (count_array.count(max_num) > 1):
+                # st.write(index, specific_genre_array, count_array)
+                # st.write("======================================")
+                # tie_count += 1
+                artists_broad_genres.append("Tie Genre")
+            else:
+                artists_broad_genres.append(broad_genres[np.array(count_array).argmax()])
 
 # st.write(tie_count)
 
 # st.write(sorted(Counter(other_array).items(), key=lambda pair: pair[1], reverse=True))
 artists_extra_df['broad_genres'] = artists_broad_genres
-st.write(artists_extra_df.head(40))
+# st.write(artists_extra_df.head(40))
 
 if st.checkbox("Show Univariate Summaries", value=False):
-	# genres_univariate = alt.Chart(genres_extra_df).mark_bar().encode(
-	# 	x = "count():Q",
-	# 	y = alt.Y("genre:N", sort='-x'),
-	# 	tooltip = ["count():Q", "broad_genre:N"],
-	# 	color = alt.Color("broad_genre:N",  sort='-x')
-	# )
-	# # st.write(genres_univariate)
+    # genres_univariate = alt.Chart(genres_extra_df).mark_bar().encode(
+    #   x = "count():Q",
+    #   y = alt.Y("genre:N", sort='-x'),
+    #   tooltip = ["count():Q", "broad_genre:N"],
+    #   color = alt.Color("broad_genre:N",  sort='-x')
+    # )
+    # # st.write(genres_univariate)
 
-	broad_genres_univariate = alt.Chart(artists_extra_df).mark_bar().encode(
-		x = "count():Q",
-		y = alt.Y("broad_genre:N", sort='-x'),
-		color = alt.Y("broad_genre:N", sort='-x'),
-		tooltip = ["count():Q"]
-	)
-	st.write(broad_genres_univariate)
+    broad_genres_univariate = alt.Chart(artists_extra_df).mark_bar().encode(
+        x = "count():Q",
+        y = alt.Y("broad_genre:N", sort='-x'),
+        color = alt.Y("broad_genre:N", sort='-x'),
+        tooltip = ["count():Q"]
+    )
+    st.write(broad_genres_univariate)
 
 
 df = merge_data(streaming_history_df, track_features_df, artists_extra_df)
 if st.checkbox("Show Merged Data", value=False):
-	st.write(df)
-	
+    st.write(df)
+
 # Filter out the rows where the song is not listened all the way through (assume that this indicates switching between songs)
 
 st.header('When I listen to music, do I listen to the whole song?')
@@ -188,34 +188,34 @@ max_seconds_played = max(df["msPlayed"]) / ms_per_second
 # make a slider that goes from 0 to max seconds played with a step size of 0.5 seconds
 seconds_slider = alt.binding_range(min=0, max=60*6, step = 0.5, name="Cutoff (seconds):")
 # make the selection that is based off of the slider and can be used by the chart
-seconds_selector = alt.selection_single(name="SelectorName", fields=["cutoff"], 
-		bind=seconds_slider, init={"cutoff": 20})
+seconds_selector = alt.selection_single(name="SelectorName", fields=["cutoff"],
+        bind=seconds_slider, init={"cutoff": 20})
 # make the chart whose x-axis in the ratio of milliseconds played to duration of the song (binned over steps of 0.1, meaning 10%)
 # and whose y-axis is the count of the number of rows that fall into the ratio bin
 # the selector (above) is used to color in the records whose milliseconds played are less than the specified selection
 # the width and height of the chart are specified to try to provide better visibility
 played_vs_duration = alt.Chart(df).mark_bar().encode(
-	alt.X("percent_listened:Q", bin=alt.Bin(step=10), title="Percent of Song"),
-	alt.Y("count():Q", title="Count of Streams"),
-	alt.Color("played_less_than_cutoff_seconds:N", title="Stream Played Shorter than Cutoff", 
-			scale=alt.Scale(domain=['true', 'false'], range=['#d8b365', '#5ab4ac'])),
-	tooltip = [alt.Tooltip("count():Q", title="Count of Streams")]
+    alt.X("percent_listened:Q", bin=alt.Bin(step=10), title="Percent of Song"),
+    alt.Y("count():Q", title="Count of Streams"),
+    alt.Color("played_less_than_cutoff_seconds:N", title="Stream Played Shorter than Cutoff",
+            scale=alt.Scale(domain=['true', 'false'], range=['#d8b365', '#5ab4ac'])),
+    tooltip = [alt.Tooltip("count():Q", title="Count of Streams")]
 ).transform_calculate(
-	played_less_than_cutoff_seconds = datum.msPlayed < (seconds_selector.cutoff * ms_per_second)
+    played_less_than_cutoff_seconds = datum.msPlayed < (seconds_selector.cutoff * ms_per_second)
 ).add_selection(
-	seconds_selector
+    seconds_selector
 ).properties(
-	title = "Percent of Songs Listened to per Stream",
-	width = 1000,
-	height = 400
+    title = "Percent of Songs Listened to per Stream",
+    width = 1000,
+    height = 400
 )
 st.write(played_vs_duration)
 
 st.write("You can use the slider above to determine that a large portion of the songs "
-	+ "listened to in this data have been listened to for less than 20 seconds. "
-	+ "These are most likely songs that were unintentionly listened to: skipped over in "
-	+ "a playlist or clicked by mistake.  We will filter these streams "
-	+ "that were listened to for less than 20 seconds out from subsequent visualizations.")
+    + "listened to in this data have been listened to for less than 20 seconds. "
+    + "These are most likely songs that were unintentionly listened to: skipped over in "
+    + "a playlist or clicked by mistake.  We will filter these streams "
+    + "that were listened to for less than 20 seconds out from subsequent visualizations.")
 
 st.write("Some songs have been listened to for >100%.  This is because the user would rewind songs.")
 
@@ -239,16 +239,16 @@ st.write('How many songs have I listened to each day?')
 
 # On x-axis: time, on y-axis: sum song count listened per x-axis day
 num_songs_chart = alt.Chart(streaming_history_df).mark_bar().encode(
-	alt.X("yearmonthdate(endTime_loc):T", title="Date"),
-	alt.Y("count():Q", title="Number of Streams"),
-	tooltip = ["count():Q", "sum(minutesPlayed):Q"]
+    alt.X("yearmonthdate(endTime_loc):T", title="Date"),
+    alt.Y("count():Q", title="Number of Streams"),
+    tooltip = ["count():Q", "sum(minutesPlayed):Q"]
 ).transform_calculate(
-	minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
+    minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
 ).transform_filter(
-	datum.msPlayed > ms_cutoff
+    datum.msPlayed > ms_cutoff
 ).properties(
-	title="Streams per Day",
-	width = 1000
+    title="Streams per Day",
+    width = 1000
 )
 
 st.write(num_songs_chart)
@@ -275,16 +275,16 @@ st.write('How many minutes of music do I listen to each day?')
 
 # On x-axis: time, on y-axis sum time listened to music per x-axis day
 num_time_chart = alt.Chart(streaming_history_df).mark_bar().encode(
-	alt.X("yearmonthdate(endTime_loc):T", title="Date"),
-	alt.Y("sum(minutesPlayed):Q", title="Minutes Streamed"),
-	tooltip = ["count():Q", "sum(minutesPlayed):Q"]
+    alt.X("yearmonthdate(endTime_loc):T", title="Date"),
+    alt.Y("sum(minutesPlayed):Q", title="Minutes Streamed"),
+    tooltip = ["count():Q", "sum(minutesPlayed):Q"]
 ).transform_calculate(
-	minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
+    minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
 ).transform_filter(
-	datum.msPlayed > ms_cutoff
+    datum.msPlayed > ms_cutoff
 ).properties(
-	title="Minutes Played per Day",
-	width = 1000
+    title="Minutes Played per Day",
+    width = 1000
 )
 st.write(num_time_chart)
 
@@ -297,7 +297,7 @@ heat_map = alt.Chart(df).mark_rect().encode(
     alt.X('yearmonthdate(endTime_loc):T', title='Date'),
     alt.Y('count()', title='Count Songs')
 ).transform_calculate(
-	averageMinutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
+    averageMinutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
 ).transform_filter(
     datum.msPlayed > ms_cutoff
 ).properties(
@@ -308,11 +308,11 @@ heat_map = alt.Chart(df).mark_rect().encode(
 daysOrdered = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 st.write(
-	heat_map.encode(
-	    	alt.X('hours(endTime_loc):O', title="Hour of the Day"),
-	    	alt.Y('day_of_week:O', title='Day of Week', sort=daysOrdered),
-	    	alt.Color('count():Q', title='Count Songs Listened') #, scale=alt.Scale(domain=date_range_selection))
-	).transform_filter( date_range_selection) & heat_map.properties(height=50).add_selection(date_range_selection).transform_filter( datum.msPlayed > ms_cutoff)
+    heat_map.encode(
+            alt.X('hours(endTime_loc):O', title="Hour of the Day"),
+            alt.Y('day_of_week:O', title='Day of Week', sort=daysOrdered),
+            alt.Color('count():Q', title='Count Songs Listened') #, scale=alt.Scale(domain=date_range_selection))
+    ).transform_filter( date_range_selection) & heat_map.properties(height=50).add_selection(date_range_selection).transform_filter( datum.msPlayed > ms_cutoff)
 )
 
 st.header("What types of music do I listen to?")
@@ -329,7 +329,7 @@ music_metrics = ["danceability", "energy", "valence", "instrumentalness", "speec
 #     row = music_metrics,
 #     column = music_metrics
 # ).properties(
-# 	width=1500
+#   width=1500
 # )
 # st.write(correlation_chart)
 
@@ -356,6 +356,16 @@ music_metrics = ["danceability", "energy", "valence", "instrumentalness", "speec
 
 st.subheader("With Spotify's API we have the following music metrics for the songs listened to: ")
 
+spotify_features_explanations = {
+        'key':'The estimated overall key of the track. Integers map to pitches using standard Pitch Class notation . E.g. 0 = C, 1 = C♯/D♭, 2 = D, and so on. If no key was detected, the value is -1.',
+        'danceability':'Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.',
+        'energy':'Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.',
+        'valence':'A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry). ',
+        'instrumentalness':'Predicts whether a track contains no vocals. “Ooh” and “aah” sounds are treated as instrumental in this context. Rap or spoken word tracks are clearly “vocal”. The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content. Values above 0.5 are intended to represent instrumental tracks, but confidence is higher as the value approaches 1.0.',
+        'speechiness':'Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks. ',
+        'acousticness':'A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.',
+        }
+
 metric_histograms = []
 for music_metric in music_metrics:
     if st.checkbox("Show " + music_metric, value=True):
@@ -367,12 +377,16 @@ for music_metric in music_metrics:
             width = 600,
             height = 200
         )
+        st.subheader(music_metric)
+        st.write(spotify_features_explanations[music_metric])
         st.write(metric_histogram)
 
+st.subheader("Now we can explore the relationship between one of these metrics, genre, and time!")
+
 input_dropdown = alt.binding_select(options=broad_genres)
-selection = alt.selection_single(fields=['broad_genre'], bind=input_dropdown, name='Country of ')
+selection = alt.selection_single(fields=['broad_genres'], bind=input_dropdown, name='Country of ')
 color = alt.condition(selection,
-                    alt.Color('broad_genre:N'),
+                    alt.Color('broad_genres:N'),
                     alt.value('#00000000'))
 
 danceability_vs_hour = alt.Chart(df).mark_point().encode(
@@ -382,7 +396,7 @@ danceability_vs_hour = alt.Chart(df).mark_point().encode(
 ).add_selection(
     selection
 ).properties(
-	width=2000, height=600
+    width=2000, height=600
 )
 
 # genre_dropdown = alt.binding_select(options=broad_genres)
@@ -407,6 +421,77 @@ danceability_vs_hour = alt.Chart(df).mark_point().encode(
 # )
 
 st.write(danceability_vs_hour)
+
+
+st.header("Throughout the day, how much music do I usually listen to? What types?")
+
+n_weeks_in_dataset = (pd.to_datetime(df['endTime_loc'], utc=True).dt.week.astype(str) \
+    + pd.to_datetime(df['endTime_loc'], utc=True).dt.year.astype(str)).nunique()
+# st.write('unique weeks: ' + str(n_weeks_in_dataset))
+
+df['minutesPlayed'] = df['msPlayed'] / ms_per_second / 60
+
+weird = alt.Chart(df).mark_area().encode(
+    alt.X('hours(endTime_loc):T', title="Hour of Day",
+        axis=alt.Axis(format='%H', domain=False, tickSize=0)
+    ),
+    alt.Y('sum(averageMinutesPlayed):Q', stack='center', title="Avg. Minutes Played in Hour Span"),
+    alt.Color('broad_genres:N',
+        scale=alt.Scale(scheme='category20b'), title="Genre"
+    ),
+    tooltip=[alt.Tooltip('hours(endTime_loc)', title="Hour of the day"),
+            alt.Tooltip('sum(averageMinutesPlayed):Q', title="Avg. Minutes Played in Hour Span"),
+            alt.Tooltip('broad_genres', title="Genre")]
+).transform_calculate(
+    averageMinutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute) / n_weeks_in_dataset
+).properties(
+    width=1000,
+    height=500,
+    title="Average Time Music was Played Throughout the Day by Genre"
+)#.interactive()
+st.write(weird)
+
+
+st.subheader("When do I listen to each type of music throughout the day?")
+
+df['minute_of_day'] = pd.to_datetime(df['endTime_loc'], utc=True).dt.hour * 60 + pd.to_datetime(df['endTime_loc'], utc=True).dt.minute
+df['hour_of_day'] = 24 - (df['minute_of_day'] / 60.)
+violin = alt.Chart(df).transform_density(
+    'hour_of_day',
+    as_=['hour_of_day', 'density'],
+    extent=[0, 24],
+    groupby=['broad_genres']
+).mark_area(orient='horizontal').encode(
+    y=alt.Y('hour_of_day:Q', title="Hour of Day"),
+    color=alt.Color('broad_genres:N', title="Genre"),
+    x=alt.X(
+        'density:Q',
+        stack='center',
+        impute=None,
+        title=None,
+        axis=alt.Axis(labels=False, values=[0],grid=False, ticks=True),
+    ),
+    column=alt.Column(
+        'broad_genres:N',
+        title="Genre",
+        header=alt.Header(
+            titleOrient='bottom',
+            labelOrient='bottom',
+            labelPadding=0,
+        ),
+    ),
+    tooltip=[alt.Tooltip('hour_of_day', title="Hour of the day"),
+            alt.Tooltip('density:Q', title="Sum Minutes Played"),
+            alt.Tooltip('broad_genres', title="Genre")]
+).properties(
+    width=90,
+    title="How each genre is listened to throughout the day"
+).configure_facet(
+    spacing=0
+).configure_view(
+    stroke=None
+)
+st.write(violin)
 
 # VISUALIZATIONS FROM SATURDAY
 #chart = alt.Chart(track_features_df).mark_point().encode(
@@ -440,4 +525,3 @@ st.write(danceability_vs_hour)
 #).interactive()
 
 #st.write(histogram)
-
