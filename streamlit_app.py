@@ -33,6 +33,9 @@ track_features_df = load_data(track_features_url)
 artists_df = load_data(artists_url)
 genres_df = load_data(genres_url)
 
+st.write("To see the raw data we gathered from the provided streaming history file and the Spotify API or" +
+    " the merged data, which is the join of the separate raw data tables, click these check boxes.")
+
 if st.checkbox("Show Raw Data", value=False):
     st.write("Streaming History.")
     st.write(streaming_history_df.head(40))
@@ -141,11 +144,17 @@ st.header('When I listen to music, do I listen to the whole song?')
 # of their duration; re-calculate the num_listens? (round up/down to the nearest integer so that those songs that were listened to close to 2 times would
 # be counted as such)
 
+st.write("In our exploratory analysis, we discovered that there are many songs that are not listened all the way through."
+    + " These are most likely songs that were unintentionaly listened to: skipped over in a playlist or clicked by mistake."
+    + " There are also some songs that have been played for more than their duration, likely because the user rewound the song."
+    + " You can use the slider to explore the relationship between the number of seconds, the proportion of the song that was"
+    + " listened to, and the distribution of the proportions in the data. The tooltip provides the exact count of songs in the"
+    + " bar being hovered over."
+    + " To improve the quality of the data analyzed, we filter out songs that were listened to for less than 20 seconds.")
+
 df = df.copy()
 df['percent_listened'] = df['msPlayed'] / df['duration_ms']
 df['percent_listened'] = df['percent_listened'].clip(0, 1.1) * 100.
-
-# cutoff_slider = st.slider('Cutoff (seconds)', min_value=0.0, max_value=8*60.0, step=0.5, value=20.0)
 
 # unit conversions
 ms_per_second = 1000
@@ -162,11 +171,11 @@ seconds_selector = alt.selection_single(name="SelectorName", fields=["cutoff"],
 # the width and height of the chart are specified to try to provide better visibility
 played_vs_duration = alt.Chart(df).mark_bar().encode(
     alt.X("percent_listened:Q", bin=alt.Bin(step=10), title="Percent of Song"),
-    alt.Y("count():Q", title="Count of Streams"),
-    alt.Color("played_less_than_cutoff_seconds:N", title="Stream Played Shorter than Cutoff",
+    alt.Y("count():Q", title="Count of Songs"),
+    alt.Color("played_less_than_cutoff_seconds:N", title="Songs Played for Less than Cutoff",
             scale=alt.Scale(domain=['true', 'false'], range=['#d8b365', '#5ab4ac']), 
             legend=alt.Legend(orient="bottom")),
-    tooltip = [alt.Tooltip("count():Q", title="Count of Streams")]
+    tooltip = [alt.Tooltip("count():Q", title="Count of Songs")]
 ).transform_calculate(
     played_less_than_cutoff_seconds = datum.msPlayed < (seconds_selector.cutoff * ms_per_second)
 ).add_selection(
@@ -178,15 +187,6 @@ played_vs_duration = alt.Chart(df).mark_bar().encode(
 )
 st.write(played_vs_duration)
 
-st.write("You can use the slider above to determine that a large portion of the songs "
-    + "listened to in this data have been listened to for less than 20 seconds. "
-    + "These are most likely songs that were unintentionly listened to: skipped over in "
-    + "a playlist or clicked by mistake.  We will filter these streams "
-    + "that were listened to for less than 20 seconds out from subsequent visualizations.")
-
-st.write("Some songs have been listened to for >100%.  This is because the user would rewind songs.")
-
-
 # For now, chose a max value of 20s from the played vs duration chart
 # This means that there can be 0 - 3 records in the filtered table
 # that have the same end time
@@ -194,6 +194,17 @@ seconds_cutoff = 20
 ms_cutoff = seconds_cutoff * ms_per_second
 
 st.header('What are my weekly and daily listening patterns?')
+
+st.write("To explore how consistently Spotify is being used to listen to music, and if there are clear seasonal, weekly, and daily patterns"
+    + " we designed a heat map whose x-axis represents the hour in the day and whose y-axis represents the day of the week, which is augmented"
+    + " by a histogram with dates on the x-axis and count of songs listened on the y-axis."
+    + " Selecting an interval of time in the bottom chart filters the data being displayed in the top chart. Both charts are color-coded"
+    + " with the count of songs listened to and the tooltip also specifies the count of songs listened to, which is useful when"
+    + " the difference between two colors is difficult to quantify. We observed that the data is somewhat sparse, and there are some listening "
+    + " sessions that are much greater than others. We also observed that when looking at all the data, songs were primarily listened to  during"
+    + " the 20:00 to 22:00 hour segments on the weekdays, but when looking at specific time periods, listening occurs at many different hour segments."
+)
+
 st.subheader('Use the chart below to narrow down a region of time to investigate.')
 
 date_range_selection = alt.selection_interval()
@@ -227,8 +238,78 @@ st.write(
         minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute))
 )
 
-st.header("What types of music do I listen to?")
+st.header("What genres of music do I listen to throughout the day, and how much time do I spend listening to them?")
+st.header("Throughout the day, how much music do I usually listen to? What types?")
 
+n_weeks_in_dataset = (pd.to_datetime(df['endTime_loc'], utc=True).dt.week.astype(str) \
+    + pd.to_datetime(df['endTime_loc'], utc=True).dt.year.astype(str)).nunique()
+
+df['minutesPlayed'] = df['msPlayed'] / ms_per_second / 60
+
+weird = alt.Chart(df).mark_area().encode(
+    alt.X('hours(endTime_loc):T', title="Hour of Day",
+        axis=alt.Axis(format='%H', domain=False, tickSize=0)
+    ),
+    alt.Y('sum(averageMinutesPlayed):Q', stack='center', title="Avg. Minutes Played in Hour Span"),
+    alt.Color('broad_genres:N',
+        scale=alt.Scale(scheme='tableau10'), title="Genre"
+    ),
+    tooltip=[alt.Tooltip('hours(endTime_loc)', title="Hour of the day"),
+            alt.Tooltip('sum(averageMinutesPlayed):Q', title="Avg. Minutes Played in Hour Span"),
+            alt.Tooltip('broad_genres', title="Genre")]
+).transform_calculate(
+    averageMinutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute) / n_weeks_in_dataset
+).properties(
+    width=1300,
+    height=500,
+    title="Average Time Music was Played Throughout the Day by Genre"
+)
+
+st.subheader("When do I listen to each type of music throughout the day?")
+
+df['minute_of_day'] = pd.to_datetime(df['endTime_loc'], utc=True).dt.hour * 60 + pd.to_datetime(df['endTime_loc'], utc=True).dt.minute
+df['hour_of_day'] = 24 - (df['minute_of_day'] / 60.)
+violin = alt.Chart(df).transform_density(
+    'hour_of_day',
+    as_=['hour_of_day', 'density'],
+    extent=[0, 24],
+    groupby=['broad_genres']
+).mark_area(orient='horizontal').encode(
+    y=alt.Y('hour_of_day:Q', title="Hour of Day"),
+    color=alt.Color('broad_genres:N', title="Genre", scale=alt.Scale(scheme='tableau10')),
+    x=alt.X(
+        'density:Q',
+        stack='center',
+        impute=None,
+        title=None,
+        axis=alt.Axis(labels=False, values=[0],grid=False, ticks=True),
+    ),
+    column=alt.Column(
+        'broad_genres:N',
+        title="Genre",
+        header=alt.Header(
+            titleOrient='bottom',
+            labelOrient='bottom',
+            labelPadding=0,
+        ),
+    ),
+    tooltip=[alt.Tooltip('hour_of_day', title="Hour of the day"),
+            alt.Tooltip('density:Q', title="Sum Minutes Played"),
+            alt.Tooltip('broad_genres', title="Genre")]
+).properties(
+    width=90,
+    title="How each genre is listened to throughout the day"
+)
+# .configure_facet(
+#     spacing=0
+# ).configure_view(
+#     stroke=None
+# )
+
+st.write(weird & violin)
+
+
+st.header("What types of music do I listen to?")
 
 music_metrics = ["danceability", "energy", "valence", "instrumentalness", "speechiness", "acousticness"]
 
@@ -287,16 +368,20 @@ metric_danceability_vs_hour = base_danceability_vs_hour.mark_bar().encode(
     alt.X(metric_dropdown + ":Q", bin=alt.Bin(step=0.05), title=metric_dropdown, scale = alt.Scale(domain=[0.0, 1.0])),
     alt.Y("count():Q", title="Number of Songs"),
     tooltip = ["count():Q"],
-    color = 'broad_genres:N'
+    color = alt.Color("broad_genres:N", scale=alt.Scale(scheme='tableau10'))
 ).properties(
     width = 600,
     height = 150
 ).transform_filter(
-    selection and scatter_brush
+    selection
+).add_selection(
+    selection
+).transform_filter(
+    scatter_brush
 )
 
 danceability_vs_hour = base_danceability_vs_hour.encode(
-  color=alt.condition(selection, 'broad_genres:N', alt.value('#00000000'))
+  color=alt.condition(selection, alt.Color('broad_genres:N', scale=alt.Scale(scheme='tableau10')), alt.value('#00000000'))
 ).add_selection(
   selection,
   scatter_brush
@@ -310,73 +395,3 @@ overlay_danceability_vs_hour = base_danceability_vs_hour.encode(
 )
 
 st.write(metric_danceability_vs_hour & (danceability_vs_hour + overlay_danceability_vs_hour))
-
-
-st.header("Throughout the day, how much music do I usually listen to? What types?")
-
-n_weeks_in_dataset = (pd.to_datetime(df['endTime_loc'], utc=True).dt.week.astype(str) \
-    + pd.to_datetime(df['endTime_loc'], utc=True).dt.year.astype(str)).nunique()
-
-df['minutesPlayed'] = df['msPlayed'] / ms_per_second / 60
-
-weird = alt.Chart(df).mark_area().encode(
-    alt.X('hours(endTime_loc):T', title="Hour of Day",
-        axis=alt.Axis(format='%H', domain=False, tickSize=0)
-    ),
-    alt.Y('sum(averageMinutesPlayed):Q', stack='center', title="Avg. Minutes Played in Hour Span"),
-    alt.Color('broad_genres:N',
-        scale=alt.Scale(scheme='category20b'), title="Genre"
-    ),
-    tooltip=[alt.Tooltip('hours(endTime_loc)', title="Hour of the day"),
-            alt.Tooltip('sum(averageMinutesPlayed):Q', title="Avg. Minutes Played in Hour Span"),
-            alt.Tooltip('broad_genres', title="Genre")]
-).transform_calculate(
-    averageMinutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute) / n_weeks_in_dataset
-).properties(
-    width=1000,
-    height=500,
-    title="Average Time Music was Played Throughout the Day by Genre"
-)
-st.write(weird)
-
-
-st.subheader("When do I listen to each type of music throughout the day?")
-
-df['minute_of_day'] = pd.to_datetime(df['endTime_loc'], utc=True).dt.hour * 60 + pd.to_datetime(df['endTime_loc'], utc=True).dt.minute
-df['hour_of_day'] = 24 - (df['minute_of_day'] / 60.)
-violin = alt.Chart(df).transform_density(
-    'hour_of_day',
-    as_=['hour_of_day', 'density'],
-    extent=[0, 24],
-    groupby=['broad_genres']
-).mark_area(orient='horizontal').encode(
-    y=alt.Y('hour_of_day:Q', title="Hour of Day"),
-    color=alt.Color('broad_genres:N', title="Genre"),
-    x=alt.X(
-        'density:Q',
-        stack='center',
-        impute=None,
-        title=None,
-        axis=alt.Axis(labels=False, values=[0],grid=False, ticks=True),
-    ),
-    column=alt.Column(
-        'broad_genres:N',
-        title="Genre",
-        header=alt.Header(
-            titleOrient='bottom',
-            labelOrient='bottom',
-            labelPadding=0,
-        ),
-    ),
-    tooltip=[alt.Tooltip('hour_of_day', title="Hour of the day"),
-            alt.Tooltip('density:Q', title="Sum Minutes Played"),
-            alt.Tooltip('broad_genres', title="Genre")]
-).properties(
-    width=90,
-    title="How each genre is listened to throughout the day"
-).configure_facet(
-    spacing=0
-).configure_view(
-    stroke=None
-)
-st.write(violin)
