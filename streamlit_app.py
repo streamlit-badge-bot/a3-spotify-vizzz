@@ -199,8 +199,6 @@ date_range_selection = alt.selection_interval()
 heat_map = alt.Chart(df).mark_rect().encode(
     alt.X('yearmonthdate(endTime_loc):T', title='Date'),
     alt.Y('count()', title='Count of Songs Listened')
-).transform_calculate(
-    averageMinutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
 ).transform_filter(
     datum.msPlayed > ms_cutoff
 ).properties(
@@ -209,14 +207,20 @@ heat_map = alt.Chart(df).mark_rect().encode(
 )
 
 daysOrdered = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+hoursOrdered = [alt.DateTime(hours = 0), alt.DateTime(hours = 1), alt.DateTime(hours = 2), alt.DateTime(hours = 3), alt.DateTime(hours = 4),
+    alt.DateTime(hours = 5), alt.DateTime(hours = 6), alt.DateTime(hours = 7), alt.DateTime(hours = 8), alt.DateTime(hours = 9), 
+    alt.DateTime(hours = 10), alt.DateTime(hours = 11), alt.DateTime(hours = 12), alt.DateTime(hours = 13), alt.DateTime(hours = 14),
+    alt.DateTime(hours = 15), alt.DateTime(hours = 16), alt.DateTime(hours = 17), alt.DateTime(hours = 18), alt.DateTime(hours = 19),
+    alt.DateTime(hours = 20), alt.DateTime(hours = 21), alt.DateTime(hours = 22), alt.DateTime(hours = 23)]
 
 st.write(
     heat_map.encode(
-        alt.X('hours(endTime_loc):O', title="Hour of Day"),
+        alt.X('hours(endTime_loc):O', title="Hour of Day", scale=alt.Scale(domain = hoursOrdered)),
         alt.Y('day_of_week:O', title='Day of Week', sort=daysOrdered, scale = alt.Scale(domain=daysOrdered)),
-        alt.Color('count():Q', title='Count Songs Listened')
+        alt.Color('count():Q', title='Count of Songs Listened'),
+        tooltip = 'count():Q'
     ).transform_filter(date_range_selection)
-    & heat_map.encode(alt.Color('count():Q', title='Count Songs Listened'), tooltip = ["count():Q", "sum(minutesPlayed):Q"]).properties(height=200).add_selection(
+    & heat_map.encode(alt.Color('count():Q', title='Count of Songs Listened'), tooltip = 'count():Q').properties(height=250).add_selection(
         date_range_selection).transform_filter(datum.msPlayed > ms_cutoff).transform_calculate(
         minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute))
 )
