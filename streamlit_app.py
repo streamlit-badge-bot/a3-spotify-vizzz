@@ -1,7 +1,9 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import numpy as np
 from altair import datum
+from collections import Counter
 
 st.title("What is the relationship between time and the music that I listen to?")
 st.subheader("In this application, we will explore how time affects our " \
@@ -40,55 +42,126 @@ if st.checkbox("Show Raw Data", value=False):
 	st.write("Genres.")
 	st.write(genres_df)
 
-df = merge_data(streaming_history_df, track_features_df, artists_df)
+broad_genres = ["Other", "Hip Hop", "Pop",  "Rap",  "R&B", "Electronica", "Rock", "Jazz", "Classical", "Indie", "Folk/Country", "No Genre", "Tie Genre"]
+hip_hop_genres = ["hop", "boom bap", "funk", "urban contemporary", "lo-fi"]
+pop_genres = ["pop", "shibuya-kei", "new jack swing", "motown"]
+rap_genres = ["rap", "trap"]
+r_b_genres = ["r&b", "soul", "blues"]
+electronica_genres = ["electronica", "electro", "tronica", "techno", "electronic", "electric", "house", "step", "electra", "glitch", "vapor twitch", "chillwave", "edm"]
+rock_genres = ["rock", "metal", "grindcore"]
+jazz_genres = ["jazz", "bossa nova", "mpb"]
+classical_genres = ["classical", "baroque", "piano cover", "impressionism", "early music"]
+folk_country_genres = ["country", "folk"]
+indie_genres = ["indie"]
 
+# India motion picture industry: filmi, 
+
+# categorizing the genres table
+# genres_extra_df = genres_df.copy()
+# broad_genres = []
+# for index, row in genres_extra_df.iterrows():
+# 	specific_genre = row['genre']
+# 	if any(substring in specific_genre for substring in hip_hop_genres):
+# 		broad_genres.append("Hip Hop")
+# 	elif any(substring in specific_genre for substring in pop_genres):
+# 		broad_genres.append("Pop")
+# 	elif any(substring in specific_genre for substring in rap_genres):
+# 		broad_genres.append("Rap")
+# 	elif any(substring in specific_genre for substring in r_b_genres):
+# 		broad_genres.append("R&B")
+# 	elif any(substring in specific_genre for substring in electronica_genres):
+# 		broad_genres.append("Electronica")
+# 	elif any(substring in specific_genre for substring in rock_genres):
+# 		broad_genres.append("Rock")
+# 	elif any(substring in specific_genre for substring in jazz_genres):
+# 		broad_genres.append("Jazz")
+# 	elif any(substring in specific_genre for substring in classical_genres):
+# 		broad_genres.append("Classical")
+# 	else:
+# 		broad_genres.append("Other")
+
+# genres_extra_df['broad_genre'] = broad_genres
+# st.write(genres_extra_df)
+
+# categorizing the artists table
+artists_extra_df = artists_df.copy()
+artists_broad_genres = []
+other_array = []
+# tie_count = 0
+for index, row in artists_extra_df.iterrows():
+	genre_array = row['genres']
+	if (str(genre_array) == "nan"):
+		artists_broad_genres.append("No Genre")
+	else:
+		trimmed_genre_array = genre_array[1:-1].replace("'", "").replace(", ", ",")
+		specific_genre_array = trimmed_genre_array.split(",")
+		# st.write(index, specific_genre_array, len(specific_genre_array))
+		if len(specific_genre_array) == int(1) and specific_genre_array[0] == "":
+			artists_broad_genres.append("No Genre")
+		else:
+			count_array = [0] * len(broad_genres)
+			for specific_genre in specific_genre_array:
+				if any(substring in specific_genre for substring in hip_hop_genres):
+					count_array[broad_genres.index("Hip Hop")] += 1
+				elif any(substring in specific_genre for substring in pop_genres):
+					count_array[broad_genres.index("Pop")] += 1
+				elif any(substring in specific_genre for substring in rap_genres):
+					count_array[broad_genres.index("Rap")] += 1
+				elif any(substring in specific_genre for substring in r_b_genres):
+					count_array[broad_genres.index("R&B")] += 1
+				elif any(substring in specific_genre for substring in electronica_genres):
+					count_array[broad_genres.index("Electronica")] += 1
+				elif any(substring in specific_genre for substring in rock_genres):
+					count_array[broad_genres.index("Rock")] += 1
+				elif any(substring in specific_genre for substring in jazz_genres):
+					count_array[broad_genres.index("Jazz")] += 1
+				elif any(substring in specific_genre for substring in classical_genres):
+					count_array[broad_genres.index("Classical")] += 1
+				elif any(substring in specific_genre for substring in indie_genres):
+					count_array[broad_genres.index("Indie")] += 1
+				elif any(substring in specific_genre for substring in folk_country_genres):
+					count_array[broad_genres.index("Folk/Country")] += 1
+				else:
+					count_array[broad_genres.index("Other")] += 1
+					other_array.append(specific_genre)
+			# artists_broad_genres
+			max_num = np.array(count_array).max()
+			if (count_array.count(max_num) > 1):
+				# st.write(index, specific_genre_array, count_array)
+				# st.write("======================================")
+				# tie_count += 1
+				artists_broad_genres.append("Tie Genre")
+			else:
+				artists_broad_genres.append(broad_genres[np.array(count_array).argmax()])
+
+# st.write(tie_count)
+
+# st.write(sorted(Counter(other_array).items(), key=lambda pair: pair[1], reverse=True))
+artists_extra_df['broad_genres'] = artists_broad_genres
+st.write(artists_extra_df.head(40))
+
+if st.checkbox("Show Univariate Summaries", value=False):
+	# genres_univariate = alt.Chart(genres_extra_df).mark_bar().encode(
+	# 	x = "count():Q",
+	# 	y = alt.Y("genre:N", sort='-x'),
+	# 	tooltip = ["count():Q", "broad_genre:N"],
+	# 	color = alt.Color("broad_genre:N",  sort='-x')
+	# )
+	# # st.write(genres_univariate)
+
+	broad_genres_univariate = alt.Chart(artists_extra_df).mark_bar().encode(
+		x = "count():Q",
+		y = alt.Y("broad_genre:N", sort='-x'),
+		color = alt.Y("broad_genre:N", sort='-x'),
+		tooltip = ["count():Q"]
+	)
+	st.write(broad_genres_univariate)
+
+
+df = merge_data(streaming_history_df, track_features_df, artists_extra_df)
 if st.checkbox("Show Merged Data", value=False):
 	st.write(df)
-
-broad_genres = ["Hip Hop", "Pop",  "Rap",  "R&B", "Electronica", "Rock", "Jazz", "Classical", "Other"]
-hip_hop_genres = ["hop", "boom bap"]
-pop_genres = ["pop"]
-rap_genres = ["rap", "trap"]
-r_b_genres = ["r&b", "soul"]
-electronica_genres = ["electronica"]
-rock_genres = ["rock"]
-jazz_genres = ["jazz", "bassa nova"]
-classical_genres = ["classical"]
-
-genres_extra_df = genres_df.copy()
-broad_genres = []
-for index, row in genres_extra_df.iterrows():
-	specific_genre = row['genre']
-	if any(substring in specific_genre for substring in hip_hop_genres):
-		broad_genres.append("Hip Hop")
-	elif any(substring in specific_genre for substring in pop_genres):
-		broad_genres.append("Pop")
-	elif any(substring in specific_genre for substring in rap_genres):
-		broad_genres.append("Rap")
-	elif any(substring in specific_genre for substring in r_b_genres):
-		broad_genres.append("R&B")
-	elif any(substring in specific_genre for substring in electronica_genres):
-		broad_genres.append("Electronica")
-	elif any(substring in specific_genre for substring in rock_genres):
-		broad_genres.append("Rock")
-	elif any(substring in specific_genre for substring in jazz_genres):
-		broad_genres.append("Jazz")
-	elif any(substring in specific_genre for substring in classical_genres):
-		broad_genres.append("Classical")
-	else:
-		broad_genres.append("Other")
-
-genres_extra_df['broad_genre'] = broad_genres
-st.write(genres_extra_df)
-
-if st.checkbox("Show Univariate Summaries", value=True):
-	genres_univariate = alt.Chart(genres_extra_df).mark_bar().encode(
-		x = "count():Q",
-		y = alt.Y("genre:N", sort='-x'),
-		tooltip = ["count():Q", "broad_genre:N"],
-		color = alt.Color("broad_genre:N")
-	)
-	st.write(genres_univariate)
+	
 # Filter out the rows where the song is not listened all the way through (assume that this indicates switching between songs)
 
 st.header('When I listen to music, do I listen to the whole song?')
@@ -296,18 +369,42 @@ for music_metric in music_metrics:
         )
         st.write(metric_histogram)
 
-
+input_dropdown = alt.binding_select(options=broad_genres)
+selection = alt.selection_single(fields=['broad_genres:N'], bind=input_dropdown, name='Country of ')
+color = alt.condition(selection,
+                    alt.Color('broad_genres:N'),
+                    alt.value('#00000000'))
 
 danceability_vs_hour = alt.Chart(df).mark_point().encode(
-   x=alt.X('hoursminutes(endTime_loc):O', title="Hour of the Day"),
-   y=alt.Y("danceability", scale=alt.Scale(zero=False), title="Danceability"),
-   color=alt.Y("n_listens_track", title="Count Listens to Song"),
-   tooltip=[alt.Tooltip("trackName", title="Track Name"), alt.Tooltip("n_listens_track", title="Number of Listens")]
-).transform_filter(
-    datum.msPlayed > ms_cutoff
+    x=alt.X('hoursminutes(endTime_loc):O', title="Hour of the Day"),
+    y=alt.Y("valence:Q", scale=alt.Scale(zero=False), title="Danceability"),
+    color=color,
+).add_selection(
+    selection
 ).properties(
-   width=1000, height=400
-).interactive()
+	width=2000, height=600
+)
+
+# genre_dropdown = alt.binding_select(options=broad_genres)
+# genre_selection = alt.selection_single(fields=['broad_genre'], bind=genre_dropdown, name='Genre is ')
+# genre_color = alt.condition(genre_selection,
+#                     alt.Color('broad_genre:N', legend=None),
+#                     alt.value('lightgray'))
+
+# danceability_vs_hour = alt.Chart(df).mark_point().encode(
+#    x=alt.X('hoursminutes(endTime_loc):O', title="Hour of the Day"),
+#    y=alt.Y("danceability", scale=alt.Scale(zero=False), title="Danceability"),
+#    color= genre_color, # alt.Color("broad_genre:N", title="Genre"),
+#    tooltip=[alt.Tooltip("trackName", title="Track Name"), alt.Tooltip("n_listens_track", title="Number of Listens")]
+# ).transform_filter(
+#     datum.msPlayed > ms_cutoff
+# ).properties(
+#    width=1000, height=400
+# ).add_selection(
+#     genre_selection
+# ).transform_filter(
+#     genre_selection
+# )
 
 st.write(danceability_vs_hour)
 
