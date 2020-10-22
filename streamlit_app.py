@@ -145,6 +145,8 @@ df = df.copy()
 df['percent_listened'] = df['msPlayed'] / df['duration_ms']
 df['percent_listened'] = df['percent_listened'].clip(0, 1.1) * 100.
 
+# cutoff_slider = st.slider('Cutoff (seconds)', min_value=0.0, max_value=8*60.0, step=0.5, value=20.0)
+
 # unit conversions
 ms_per_second = 1000
 seconds_per_minute = 60
@@ -260,20 +262,27 @@ for music_metric in music_metrics:
 
 st.subheader("Now we can explore the relationship between one of these metrics, genre, and time!")
 
-input_dropdown = alt.binding_select(options=broad_genres)
-selection = alt.selection_single(fields=['broad_genres'], bind=input_dropdown, name='Country of ')
+input_dropdown = alt.binding_select(options=broad_genres, name = "Broad Genre: ")
+selection = alt.selection_single(fields=['broad_genres'], bind=input_dropdown)
 color = alt.condition(selection,
                     alt.Color('broad_genres:N'),
                     alt.value('#00000000'))
 
+# metric_dropdown = alt.binding_select(options=music_metrics, name = "Music Metric: ")
+# metric_selection = alt.selection_single(fields=["metric"], bind=metric_dropdown)
+metric_dropdown = st.selectbox('Music Metric:', music_metrics)
+# color = alt.condition(selection,
+#                     alt.Color('broad_genres:N'),
+#                     alt.value('#00000000'))
+
 danceability_vs_hour = alt.Chart(df).mark_point().encode(
     x=alt.X('hoursminutes(endTime_loc):O', title="Hour of the Day"),
-    y=alt.Y("valence:Q", scale=alt.Scale(zero=False), title="Danceability"),
+    y=alt.Y(metric_dropdown, type="quantitative", scale=alt.Scale(zero=False)),
     color=color,
 ).add_selection(
     selection
 ).properties(
-    width=2000, height=600
+    width=1000, height=600
 )
 
 st.write(danceability_vs_hour)
