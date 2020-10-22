@@ -191,47 +191,6 @@ st.write("Some songs have been listened to for >100%.  This is because the user 
 seconds_cutoff = 20
 ms_cutoff = seconds_cutoff * ms_per_second
 
-st.header('When do I listen to music?')
-
-# calculating the total hours played to see how much sparcity we might expect
-sum_hours_played = sum(df["msPlayed"]) / (ms_per_second * seconds_per_minute * minutes_per_hour)
-st.write("Total hours of music played = ", sum_hours_played)
-
-st.write('How many songs have I listened to each day?')
-
-# On x-axis: time, on y-axis: sum song count listened per x-axis day
-num_songs_chart = alt.Chart(streaming_history_df).mark_bar().encode(
-    alt.X("yearmonthdate(endTime_loc):T", title="Date"),
-    alt.Y("count():Q", title="Number of Streams"),
-    tooltip = ["count():Q", "sum(minutesPlayed):Q"]
-).transform_calculate(
-    minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
-).transform_filter(
-    datum.msPlayed > ms_cutoff
-).properties(
-    title="Streams per Day",
-    width = 1000
-)
-
-st.write(num_songs_chart)
-
-st.write('How many minutes of music do I listen to each day?')
-
-# On x-axis: time, on y-axis sum time listened to music per x-axis day
-num_time_chart = alt.Chart(streaming_history_df).mark_bar().encode(
-    alt.X("yearmonthdate(endTime_loc):T", title="Date"),
-    alt.Y("sum(minutesPlayed):Q", title="Minutes Streamed"),
-    tooltip = ["count():Q", "sum(minutesPlayed):Q"]
-).transform_calculate(
-    minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
-).transform_filter(
-    datum.msPlayed > ms_cutoff
-).properties(
-    title="Minutes Played per Day",
-    width = 1000
-)
-st.write(num_time_chart)
-
 st.header('What are my weekly and daily listening patterns?')
 st.subheader('Use the chart below to narrow down a region of time to investigate.')
 
@@ -239,7 +198,7 @@ date_range_selection = alt.selection_interval()
 
 heat_map = alt.Chart(df).mark_rect().encode(
     alt.X('yearmonthdate(endTime_loc):T', title='Date'),
-    alt.Y('count()', title='Count Songs')
+    alt.Y('count()', title='Count of Songs Listened')
 ).transform_calculate(
     averageMinutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute)
 ).transform_filter(
@@ -253,10 +212,13 @@ daysOrdered = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday
 
 st.write(
     heat_map.encode(
-            alt.X('hours(endTime_loc):O', title="Hour of the Day"),
-            alt.Y('day_of_week:O', title='Day of Week', sort=daysOrdered, scale = alt.Scale(domain=daysOrdered)),
-            alt.Color('count():Q', title='Count Songs Listened')
-    ).transform_filter( date_range_selection) & heat_map.properties(height=50).add_selection(date_range_selection).transform_filter( datum.msPlayed > ms_cutoff)
+        alt.X('hours(endTime_loc):O', title="Hour of Day"),
+        alt.Y('day_of_week:O', title='Day of Week', sort=daysOrdered, scale = alt.Scale(domain=daysOrdered)),
+        alt.Color('count():Q', title='Count Songs Listened')
+    ).transform_filter(date_range_selection)
+    & heat_map.encode(alt.Color('count():Q', title='Count Songs Listened'), tooltip = ["count():Q", "sum(minutesPlayed):Q"]).properties(height=200).add_selection(
+        date_range_selection).transform_filter(datum.msPlayed > ms_cutoff).transform_calculate(
+        minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute))
 )
 
 st.header("What types of music do I listen to?")
