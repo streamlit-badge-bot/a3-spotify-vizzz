@@ -355,6 +355,7 @@ music_metrics = ["danceability", "energy", "valence", "instrumentalness", "speec
 # st.write(metric_histograms)
 
 st.subheader("With Spotify's API we have the following music metrics for the songs listened to: ")
+st.write("Descriptions are provided courtesy of Spotify API Reference: https://developer.spotify.com/documentation/web-api/reference/")
 
 spotify_features_explanations = {
         'key':'The estimated overall key of the track. Integers map to pitches using standard Pitch Class notation . E.g. 0 = C, 1 = C♯/D♭, 2 = D, and so on. If no key was detected, the value is -1.',
