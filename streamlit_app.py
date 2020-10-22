@@ -245,20 +245,20 @@ spotify_features_explanations = {
         'acousticness':'A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.',
         }
 
-metric_histograms = []
-for music_metric in music_metrics:
-    if st.checkbox("Show " + music_metric, value=True):
-        metric_histogram = alt.Chart(track_features_df).mark_bar().encode(
-            alt.X(music_metric + ":Q", bin=alt.Bin(step=0.1), title=music_metric),
-            alt.Y("count():Q", title="Number of Songs"),
-            tooltip = ["count():Q"]
-        ).properties(
-            width = 600,
-            height = 200
-        )
-        st.subheader(music_metric)
-        st.write(spotify_features_explanations[music_metric])
-        st.write(metric_histogram)
+# metric_histograms = []
+# for music_metric in music_metrics:
+#     if st.checkbox("Show " + music_metric, value=True):
+#         metric_histogram = alt.Chart(track_features_df).mark_bar().encode(
+#             alt.X(music_metric + ":Q", bin=alt.Bin(step=0.1), title=music_metric),
+#             alt.Y("count():Q", title="Number of Songs"),
+#             tooltip = ["count():Q"]
+#         ).properties(
+#             width = 600,
+#             height = 200
+#         )
+#         st.subheader(music_metric)
+#         st.write(spotify_features_explanations[music_metric])
+#         st.write(metric_histogram)
 
 st.subheader("Now we can explore the relationship between one of these metrics, genre, and time!")
 
@@ -271,19 +271,35 @@ input_dropdown = alt.binding_select(options=broad_genres, name = "Broad Genre: "
 selection = alt.selection_single(fields=['broad_genres'], bind=input_dropdown)
 color = alt.condition(selection, alt.Color('broad_genres:N'), alt.value('#00000000'))
 
+scatter_brush = alt.selection(type='interval')
+
 metric_dropdown = st.selectbox('Music Metric:', music_metrics)
+st.write(spotify_features_explanations[metric_dropdown])
 
 base_danceability_vs_hour = alt.Chart(df).mark_point().encode(
     x=alt.X('hoursminutes(endTime_loc):O', title="Hour of the Day", scale = alt.Scale(domain=hoursMinutesOrdered)),
     y=alt.Y(metric_dropdown, type="quantitative", scale=alt.Scale(zero=False, domain=[0.0, 1.0]))
 ).properties(
-    width=1000, height=600
+    width=700, height=500
+)
+
+metric_danceability_vs_hour = base_danceability_vs_hour.mark_bar().encode(
+    alt.X(metric_dropdown + ":Q", bin=alt.Bin(step=0.05), title=metric_dropdown, scale = alt.Scale(domain=[0.0, 1.0])),
+    alt.Y("count():Q", title="Number of Songs"),
+    tooltip = ["count():Q"],
+    color = 'broad_genres:N'
+).properties(
+    width = 600,
+    height = 150
+).transform_filter(
+    selection and scatter_brush
 )
 
 danceability_vs_hour = base_danceability_vs_hour.encode(
   color=alt.condition(selection, 'broad_genres:N', alt.value('#00000000'))
 ).add_selection(
-  selection
+  selection,
+  scatter_brush
 )
 
 overlay_danceability_vs_hour = base_danceability_vs_hour.encode(
@@ -293,7 +309,7 @@ overlay_danceability_vs_hour = base_danceability_vs_hour.encode(
   selection
 )
 
-st.write(danceability_vs_hour + overlay_danceability_vs_hour)
+st.write(metric_danceability_vs_hour & (danceability_vs_hour + overlay_danceability_vs_hour))
 
 
 st.header("Throughout the day, how much music do I usually listen to? What types?")
