@@ -328,7 +328,8 @@ spotify_features_explanations = {
 
 st.subheader("Use the music metric dropdown (above the charts) to select the metric that will be presented in the charts."
     + " Use the broad genre dropdown (below the charts) to view only the data of that genre."
-    + " Use interval selection to view the music metric distribution for a subset of points.")
+    + " Use interval selection to view the music metric distribution for a subset of points."
+    + " Use tooltip to see the artist name and track (song) name for a particular data point.")
 
 hoursMinutesOrdered = []
 for hour in range(0, 24):
