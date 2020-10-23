@@ -47,7 +47,7 @@ if st.checkbox("Show Raw Data", value=False):
     st.write(genres_df.head(40))
 
 # The broad genres are what will be used
-broad_genres = ["Other", "Hip Hop", "Pop",  "Rap",  "R&B", "Electronica", "Rock", "Jazz", "Classical", "Indie", "Folk/Country", "No Genre", "Tie Genre"]
+broad_genres = ["Classical", "Electronica", "Folk/Country", "Hip Hop", "Indie", "Jazz", "No Genre", "Other", "Pop",  "R&B", "Rap", "Rock", "Tie Genre"]
 # These are specific key words that differentiate the specific genres and allow us to categorizez them
 hip_hop_genres = ["hop", "boom bap", "funk", "urban contemporary", "lo-fi"]
 pop_genres = ["pop", "shibuya-kei", "new jack swing", "motown"]
@@ -239,6 +239,22 @@ st.write(
 )
 
 st.header("How much time do I spend listening to each genre? How do my listening habits compare across genres?")
+
+st.write('Spotify provides a list of genres for most artists.  These genres are very specific '
+    + 'such as "norwegian pop" or "thai indie rock".  There were 501 unique genre names in our dataset. '
+    + 'In order to perform analyisis we clustered these specific genres into broad genres such as '
+    + '"Pop", "Rock", or "Classical".  We used keywords to match each specific genre to broad genre. '
+    + 'In the charts below you can see each genre and how they were listened to throughout the day.  '
+    + 'Some artists did not have genre information from '
+    + 'Spotify leading to a "No Genre" categorization.  If two or more broad genres seemed equally apt'
+    + ', we categorized the artist as "Tie Genre".  "Other" was used when no keywords matched the specific genre '
+    + 'to broad genre.')
+
+st.write('Use the plots below to understand how much music is listened to during the average day. '
+    + 'Then investigate how each genre is listened to throughout the day.  Notice that some genres '
+    + 'are evenly distributed while most are concentrated in the morning and evening.'
+    + ' Please note that each genre in the violin plot has equal total density despite some '
+    + 'being listened to more frequently.  This violin plot if for comparing the listening habits for each genre.')
 
 n_weeks_in_dataset = (pd.to_datetime(df['endTime_loc'], utc=True).dt.week.astype(str)
     + pd.to_datetime(df['endTime_loc'], utc=True).dt.year.astype(str)).nunique()
