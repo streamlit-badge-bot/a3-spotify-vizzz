@@ -181,7 +181,7 @@ played_vs_duration = alt.Chart(df).mark_bar().encode(
 ).add_selection(
     seconds_selector
 ).properties(
-    title = "Percent of Songs Listened to per Stream",
+    title = "Percent of Song Duration Listened to per Song",
     width = 1000,
     height = 400
 )
