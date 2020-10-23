@@ -19,9 +19,9 @@ To achieve our goal, we used more complex plots with interactions to allow users
 
 ## Development Process
 
-Equal time was spent between Paulina and Peter.  Initially working separately, Peter and Paulina had two long zoom meetings to discuss the topic and the dataset.  Then working separately, Peter had time to work on converting the raw data into clean csv files.  Paulina then worked on some initial visualizations of the data.  Then, through a series of zoom calls with peer programming, they completed the assignment together.
+Equal time was spent between Paulina and Peter.  Initially working separately, Peter and Paulina had two long zoom meetings to discuss the topic and the dataset.  Then working separately, Peter had time to work on converting the raw data into clean csv files.  It took about a half hour to get all the data from the Spotify API for each track and artist.  Paulina then worked on some initial visualizations of the data.  Then, through a series of zoom calls with peer programming, they completed the assignment together.
 
-Cleaning the dataset at first took about 4 hours then doing some song genre imputation took about 2 hours.  The most difficult and time consuming process of the project was making specific plots in altair.  It was very easy to do certain things with altair, but trying to get something very specific to work could take almost hours.  The 6 zoom meetings were each about 3 hours long.  All in all, each partner spent about 25 hours on the project for a total of 50 people-hours.
+Cleaning the dataset at first took about 4 hours then doing some song genre imputation took about 4 hours.  The genres that were linked from the Spotify API were too specific ("norwegian indie rock", "post-teen pop") so we needed to create an algorithm to map these specific genres to broad genres.  We used keywords and voting to match each artist with a broad genre.  See `streamlit_app.py` for details.  The most difficult and time consuming process of the project was making specific plots in altair.  It was very easy to do certain things with altair, but trying to get something very specific to work could take almost hours.  The 6 zoom meetings were each about 3 hours long.  All in all, each partner spent about 25 hours on the project for a total of 50 people-hours.
 
 ## Instructions
 
