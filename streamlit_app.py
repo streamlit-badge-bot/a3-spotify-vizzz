@@ -346,7 +346,7 @@ spotify_features_explanations = {
 
 st.subheader("Use the music metric dropdown (above the charts) to select the metric that will be presented in the charts."
     + " Use the broad genre dropdown (below the charts) to view only the data of that genre."
-    + " Use interval selection to view the music metric distribution for a subset of points."
+    + " Click and drag to select a subset of points in the scatter plot and view their music metric distribution in the histogram."
     + " Use tooltip to see the artist name and track (song) name for a particular data point.")
 
 hoursMinutesOrdered = []
