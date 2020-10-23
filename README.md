@@ -3,12 +3,18 @@
 * **Team members**: pldaviso@andrew.cmu.edu and pschalde@andrew.cmu.edu
 * **Online URL**: https://share.streamlit.io/cmu-ids-2020/a3-spotify-vizzz
 
-# How does time affect my music listening habits?
-In this application, we explore the relationship between time and the types of music that a user of Spotify listens to.  We have music streaming data provided by [saraclay on Kaggle](https://www.kaggle.com/saraclay/my-spotify-streaming-history).  If you are a spotify user, you can export your data and use it with this application too using [these instructions for exporting](https://www.spotify.com/ca-en/account/privacy/).  You can then use our notebook `Transform Streaming History.ipynb` get your data ready for the streamlit application run using `streamlit run streamlit_app.py`
+# What can I learn about my music listening habits?
+In this application, we explore the relationship between time, genre, and song characteristics for the music that a user of Spotify listens to.  The data presented in this application is provided by [saraclay on Kaggle](https://www.kaggle.com/saraclay/my-spotify-streaming-history). If you are a spotify user, you can export your data and use it with this application too using [these instructions for exporting](https://www.spotify.com/ca-en/account/privacy/).  You can then use our notebook `Transform Streaming History.ipynb` to get your data ready for the streamlit application, clone this repository, add your files to the repository, replace the run the 'data_source' with the suffix of your file names, and run the application with your data from the command line using the command `streamlit run streamlit_app.py`
 
 ## Goal
-Our goal in this application was to explore the types of music listened to, when the music was listened to, and how the types and time of music listened relate (or don't).
+The primary question that we are exploring in this application is "what can we learn about the user’s listening habits through three aspects of their Spotify data: time when songs were listened to, music genre associated with the song's artist, and characteristics of individual songs?" This question was interesting to us because of the idea that such habits often go unrecognized and can be difficult to discover using only the Spotify application. The nearest feedback is from the 'rewind' playlists that Spotify produces, which use their own algorithms to select the user's favorite songs during a time period. The dimensions and measures that we examine are not readily available through the Spotify application - we collected the spotify genres and track features using tools presented through Spotify for Developers (https://developer.spotify.com/) and categorized the provided specific genres into broader genre groups for our analysis.
 
+Some of the specific questions that we hope this application enables the user to explore are:
+* How consistently does the user listen through spotify? Are there weekly, monthly, yearly patterns? When do they most often listen?
+* What are the user's preferences as far as music genre? How much variety in genre does the data display? Do they like listening to certain genres at certain times of the day?
+* What do the danceability, energy, etc. of songs show about the user's preferences? Are those characteristics associated with the genre being listened to or the time of day that listening occurs?
+
+We provide the tools to explore our primary questions and these specific questions in our application by building up the dimensions being included. We start with an aspect of data quality that was unexpected and interesting: "When I listen to music, do I listen to the whole song?" We then present plots that analyze the time that listening occurs: "What are my weekly and daily listening patterns?" We enable the user to explore the relationship between time and genre through a streamgraph and violin plot: "How much time do I spend listening to each genre? How do my listening habits compare across genres?" And then we add in the music characteristics (called track features by Spotify) to allow exploration of the three aspects of time, genre, and music characteristic together: "What are the characteristics of the music that I listen to? Are there any patterns across genre and time of day?"
 
 ## Rationale
 
