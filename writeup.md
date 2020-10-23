@@ -1,6 +1,6 @@
 # Spotify Listening Habits
 
-![A screenshot of your application.](screenshot.png)
+![A screenshot of your application.](song_screenshot.png)
 
 In this application, we explore the relationship between time, genre, and song characteristics for the music that a user of Spotify listens to. The data presented in this application is provided by [saraclay on Kaggle](https://www.kaggle.com/saraclay/my-spotify-streaming-history). We provide visualizations of the quality of the data, the listening habits over time, the relationship between genre listened to and the time of day that listening occurred, and the relationship between characteristics of songs, the genre they belong to, and the time of day that listening occurred.
 
