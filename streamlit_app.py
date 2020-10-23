@@ -324,7 +324,7 @@ violin = alt.Chart(df).transform_density(
 st.write(weird & violin)
 
 
-st.header("What are the characteristics of the genres of music that I listen to?")
+st.header("What are the characteristics of the music that I listen to? Are there any patterns across genre and time of day?")
 
 st.write("The Spotify API provides music metrics about each track, which quantify different characteristics of the track, and are used internally by Spotify."
     + " We chose a subset of these metrics to compare across genres and across the time in a day: danceability, energy, valence, instrumentalness, speechiness, "
