@@ -205,7 +205,7 @@ st.write("To explore how consistently Spotify is being used to listen to music, 
     + " the 20:00 to 22:00 hour segments on the weekdays, but when looking at specific time periods, listening occurs at many different hour segments."
 )
 
-st.subheader('Use the chart below to narrow down a region of time to investigate.')
+st.subheader('Use the bottom chart to narrow down a region of time to investigate on the top chart.')
 
 date_range_selection = alt.selection_interval()
 
@@ -306,14 +306,15 @@ violin = alt.Chart(df).transform_density(
 st.write(weird & violin)
 
 
-st.header("What genres of music do I listen to?")
+st.header("What are the characteristics of the genres of music that I listen to?")
 
-st.write("The Spotify API provides measurements set of track features that are measured ")
+st.write("The Spotify API provides music metrics about each track, which quantify different characteristics of the track, and are used internally by Spotify."
+    + " We chose a subset of these metrics to compare across genres and across the time in a day: danceability, energy, valence, instrumentalness, speechiness, "
+    + " and acousticness. The danceability, energy and valence (positivity) metrics have somewhat similar distributions and the instrumentalness, speechiness, and"
+    + " acousticness (non-electric) metrics have somewhat similar distributions. All the metrics that we chose have domains from 0.0 to 1.0."
+    + " Descriptions of the music metrics are provided courtesy of Spotify API Reference: https://developer.spotify.com/documentation/web-api/reference/")
 
 music_metrics = ["danceability", "energy", "valence", "instrumentalness", "speechiness", "acousticness"]
-
-st.subheader("With Spotify's API we have the following music metrics for the songs listened to: ")
-st.write("Descriptions are provided courtesy of Spotify API Reference: https://developer.spotify.com/documentation/web-api/reference/")
 
 spotify_features_explanations = {
         'key':'The estimated overall key of the track. Integers map to pitches using standard Pitch Class notation . E.g. 0 = C, 1 = C♯/D♭, 2 = D, and so on. If no key was detected, the value is -1.',
@@ -325,7 +326,9 @@ spotify_features_explanations = {
         'acousticness':'A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.',
         }
 
-st.subheader("Now we can explore the relationship between one of these metrics, genre, and time!")
+st.subheader("Use the music metric dropdown (above the charts) to select the metric that will be presented in the charts."
+    + " Use the broad genre dropdown (below the charts) to view only the data of that genre."
+    + " Use interval selection to view the music metric distribution for a subset of points.")
 
 hoursMinutesOrdered = []
 for hour in range(0, 24):
