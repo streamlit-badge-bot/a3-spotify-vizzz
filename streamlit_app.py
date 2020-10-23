@@ -254,7 +254,9 @@ st.write('Use the plots below to understand how much music is listened to during
     + 'Then investigate how each genre is listened to throughout the day.  Notice that some genres '
     + 'are evenly distributed while most are concentrated in the morning and evening.'
     + ' Please note that each genre in the violin plot has equal total density despite some '
-    + 'being listened to more frequently.  This violin plot if for comparing the listening habits for each genre.')
+    + 'being listened to more frequently.  This violin plot if for comparing the listening habits for each genre.'
+    + ' Tooltip over both plots to see the average number of minutes played for a particular genre in that hour (streamgraph) or '
+    + 'the density measurement of minutes played for a particular genre in that hour (violin plot)')
 
 n_weeks_in_dataset = (pd.to_datetime(df['endTime_loc'], utc=True).dt.week.astype(str)
     + pd.to_datetime(df['endTime_loc'], utc=True).dt.year.astype(str)).nunique()
@@ -270,7 +272,7 @@ weird = alt.Chart(df).mark_area().encode(
         scale=alt.Scale(scheme='tableau10'), title="Genre"
     ),
     tooltip=[alt.Tooltip('hours(endTime_loc)', title="Hour of the day"),
-            alt.Tooltip('sum(averageMinutesPlayed):Q', title="Avg. Minutes Played in Hour Span"),
+            alt.Tooltip('sum(averageMinutesPlayed):Q', title="Avg. Minutes Played"),
             alt.Tooltip('broad_genres', title="Genre")]
 ).transform_calculate(
     averageMinutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute) / n_weeks_in_dataset
@@ -307,7 +309,7 @@ violin = alt.Chart(df).transform_density(
         ),
     ),
     tooltip=[alt.Tooltip('hour_of_day', title="Hour of the day"),
-            alt.Tooltip('density:Q', title="Sum Minutes Played"),
+            alt.Tooltip('density:Q', title="Density Minutes Played"),
             alt.Tooltip('broad_genres', title="Genre")]
 ).properties(
     width=90,
