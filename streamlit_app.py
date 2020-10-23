@@ -149,8 +149,8 @@ st.write("In our exploratory analysis, we discovered that there are many songs t
     + " There are also some songs that have been played for more than their duration, likely because the user rewound the song."
     + " You can use the slider to explore the relationship between the number of seconds, the proportion of the song that was"
     + " listened to, and the distribution of the proportions in the data. The tooltip provides the exact count of songs in the"
-    + " bar being hovered over."
-    + " To improve the quality of the data analyzed, we filter out songs that were listened to for less than 20 seconds.")
+    + " bar being hovered over. To improve the quality of the data analyzed, in allowing following charts we filter out songs"
+    + " that were listened to for less than 20 seconds.")
 
 df = df.copy()
 df['percent_listened'] = df['msPlayed'] / df['duration_ms']
@@ -238,10 +238,9 @@ st.write(
         minutesPlayed = datum.msPlayed / (ms_per_second * seconds_per_minute))
 )
 
-st.header("What genres of music do I listen to throughout the day, and how much time do I spend listening to them?")
-st.header("Throughout the day, how much music do I usually listen to? What types?")
+st.header("How much time do I spend listening to each genre? How do my listening habits compare across genres?")
 
-n_weeks_in_dataset = (pd.to_datetime(df['endTime_loc'], utc=True).dt.week.astype(str) \
+n_weeks_in_dataset = (pd.to_datetime(df['endTime_loc'], utc=True).dt.week.astype(str)
     + pd.to_datetime(df['endTime_loc'], utc=True).dt.year.astype(str)).nunique()
 
 df['minutesPlayed'] = df['msPlayed'] / ms_per_second / 60
@@ -264,8 +263,6 @@ weird = alt.Chart(df).mark_area().encode(
     height=500,
     title="Average Time Music was Played Throughout the Day by Genre"
 )
-
-st.subheader("When do I listen to each type of music throughout the day?")
 
 df['minute_of_day'] = pd.to_datetime(df['endTime_loc'], utc=True).dt.hour * 60 + pd.to_datetime(df['endTime_loc'], utc=True).dt.minute
 df['hour_of_day'] = 24 - (df['minute_of_day'] / 60.)
@@ -309,7 +306,9 @@ violin = alt.Chart(df).transform_density(
 st.write(weird & violin)
 
 
-st.header("What types of music do I listen to?")
+st.header("What genres of music do I listen to?")
+
+st.write("The Spotify API provides measurements set of track features that are measured ")
 
 music_metrics = ["danceability", "energy", "valence", "instrumentalness", "speechiness", "acousticness"]
 
@@ -325,21 +324,6 @@ spotify_features_explanations = {
         'speechiness':'Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks. ',
         'acousticness':'A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.',
         }
-
-# metric_histograms = []
-# for music_metric in music_metrics:
-#     if st.checkbox("Show " + music_metric, value=True):
-#         metric_histogram = alt.Chart(track_features_df).mark_bar().encode(
-#             alt.X(music_metric + ":Q", bin=alt.Bin(step=0.1), title=music_metric),
-#             alt.Y("count():Q", title="Number of Songs"),
-#             tooltip = ["count():Q"]
-#         ).properties(
-#             width = 600,
-#             height = 200
-#         )
-#         st.subheader(music_metric)
-#         st.write(spotify_features_explanations[music_metric])
-#         st.write(metric_histogram)
 
 st.subheader("Now we can explore the relationship between one of these metrics, genre, and time!")
 
